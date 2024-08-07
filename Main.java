@@ -1,113 +1,117 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String userId, password;
-        String input;
-        System.out.print("Enter user ID: ");
-        userId = scanner.nextLine();
-        System.out.print("Enter password: ");
-        password = scanner.nextLine();
 
-        if (!userId.equals("user") || !password.equals("1234")) {
-            System.out.println("Invalid login. Exiting...");
-            return;
-        }
+        String correctUserName = "user";
+        String correctPassword = "1234";
+        int numOfAttempts = 4;
 
-        while (true) {
-            System.out.println("Enter the number of items (or type 'quit' to exit): ");
-            input = scanner.nextLine();
+        System.out.print("Enter a task (start, quit): ");
+        String task = scanner.nextLine();
 
-            if (input.equalsIgnoreCase("quit")) {
-                break;
-            }
+        if (task.equals("start")) {
+            while (numOfAttempts > 0) {
+                System.out.print("Enter your Username: ");
+                String enteredUsername = scanner.nextLine();
+                System.out.print("Enter your Password: ");
+                String enteredPassword = scanner.nextLine();
 
-            int numOfItems;
-            try {
-                numOfItems = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid number of items. Try again.");
-                continue;
-            }
+                if (enteredUsername.equals(correctUserName) && enteredPassword.equals(correctPassword)) {
+                    System.out.println("Username and password is right");
 
-            double total = 0.0;
-            for (int i = 1; i <= numOfItems; i++) {
-                System.out.print("Enter the price of item " + i + ": ");
-                double price;
-                try {
-                    price = Double.parseDouble(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid price. Try again.");
-                    i--; // Repeat the same item
-                    continue;
+                    int totalSumOfItems = 0;
+                    System.out.print("Enter number of items: ");
+                    int noOfItems = scanner.nextInt();
+
+                    ArrayList<Integer> ItemsPrice = new ArrayList<>();
+                    
+
+                    for (int i = 0; i < noOfItems; i++) {
+                        System.out.print("Enter price of Item " + (i + 1) + ": ");
+                        ItemsPrice.add(scanner.nextInt());
+                        totalSumOfItems = ItemsPrice.get(i);
+                    }
+
+                    int vatPercentage = 0;
+                    System.out.print("Is VAT charged (Y/N): ");
+                    String isVat = scanner.next().trim().toLowerCase();
+
+                    if (isVat.equals("y")) {
+                        vatPercentage = 13;
+                    }
+
+                    int discountPercentage = 0;
+                    System.out.print("Input a discount percentage : ");
+                    discountPercentage = scanner.nextInt();
+
+                    double totalWithVAT = totalSumOfItems * (1 + vatPercentage / 100.0);
+                    double totalWithDiscountAndVat = totalWithVAT * (1 - discountPercentage / 100.0);
+
+                    
+                    long roundedTotal = Math.round(totalWithDiscountAndVat);
+
+                
+                    System.out.print("Enter Amount of money paid: ");
+                    int paidAmount = scanner.nextInt();
+
+                    int returnAmount = (int) (paidAmount - roundedTotal);
+                    if (returnAmount >= 0) {
+                        System.out.println("Change returned: " + returnAmount);
+                        if (returnAmount > 0) {
+                            if (returnAmount >= 1000) {
+                                System.out.println("1000 - " + returnAmount / 1000);
+                                returnAmount %= 1000;
+                            }
+                            if (returnAmount >= 500) {
+                                System.out.println("500 - " + returnAmount / 500);
+                                returnAmount %= 500;
+                            }
+                            if (returnAmount >= 100) {
+                                System.out.println("100 - " + returnAmount / 100);
+                                returnAmount %= 100;
+                            }
+                            if (returnAmount >= 50) {
+                                System.out.println("50 - " + returnAmount / 50);
+                                returnAmount %= 50;
+                            }
+                            if (returnAmount >= 20) {
+                                System.out.println("20 - " + returnAmount / 20);
+                                returnAmount %= 20;
+                            }
+                            if (returnAmount >= 10) {
+                                System.out.println("10 - " + returnAmount / 10);
+                                returnAmount %= 10;
+                            }
+                            if (returnAmount >= 5) {
+                                System.out.println("5 - " + returnAmount / 5);
+                                returnAmount %= 5;
+                            }
+                            if (returnAmount > 0) {
+                                System.out.println("Remaining change - " + returnAmount);
+                            }
+                        }
+                    } else {
+                        System.out.println("You don't have sufficent money.");
+                    }
+                    break;
+                } else {
+                    numOfAttempts--;
+                    System.out.println("Incorrect Username or password.");
                 }
-                total += price;
             }
 
-            System.out.print("Charge VAT (yes/no)? ");
-            String chargeVAT = scanner.nextLine();
-            if (chargeVAT.equalsIgnoreCase("yes")) {
-                total *= 1.13; // Add 13% VAT
+            if (numOfAttempts <= 0) {
+                System.out.println("Access denied.");
             }
-
-            System.out.print("Enter discount percentage: ");
-            double discount;
-            try {
-                discount = Double.parseDouble(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid discount percentage. No discount will be applied.");
-                discount = 0;
-            }
-            total -= total * (discount / 100);
-
-            System.out.println("Total amount to be paid: " + total);
-
-            System.out.print("Enter payment amount: ");
-            double payment;
-            try {
-                payment = Double.parseDouble(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid payment amount. Try again.");
-                continue;
-            }
-
-            double change = payment - total;
-            if (change < 0) {
-                System.out.println("Insufficient payment. Try again.");
-                continue;
-            }
-
-            System.out.println("Change: " + change);
-
-            double highestDenomination;
-            if (change >= 100) {
-                highestDenomination = 100;
-            } else if (change >= 50) {
-                highestDenomination = 50;
-            } else if (change >= 20) {
-                highestDenomination = 20;
-            } else if (change >= 10) {
-                highestDenomination = 10;
-            } else if (change >= 5) {
-                highestDenomination = 5;
-            } else if (change >= 1) {
-                highestDenomination = 1;
-            } else if (change >= 0.25) {
-                highestDenomination = 0.25;
-            } else if (change >= 0.1) {
-                highestDenomination = 0.1;
-            } else if (change >= 0.05) {
-                highestDenomination = 0.05;
-            } else {
-                highestDenomination = 0.01;
-            }
-
-            System.out.println("Highest denomination of change: " + highestDenomination);
+        } else if (task.equals("quit")) {
+            System.out.println("Exiting the system.");
+        } else {
+            System.out.println("Invalid Input.");
         }
 
-        System.out.println("Program terminated.");
         scanner.close();
     }
 }
